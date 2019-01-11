@@ -1,18 +1,25 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
-
+import { StyleSheet, Text, View, TextInput } from 'react-native';
+import TestCom from './src/components/TestCom';
 export default class App extends React.Component {
+  constructor(props){
+    super(props);
+    
+    this.state = {
+      username: 'thienth',
+      email: 'thienth32@gmail.com'
+    };
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>Name: Tran Huu Thien</Text>
-        <Text>Age: 29</Text>
-        <Text>Hometown: Nam Dinh</Text>
-        <Text>Is Married: Yes</Text>
-        <Image
-          style={{width: 150, height: 200}}
-          source={{uri: 'https://scontent.fhan5-2.fna.fbcdn.net/v/t1.0-9/26167120_1822184234490077_7888484618727660984_n.jpg?_nc_cat=110&_nc_ht=scontent.fhan5-2.fna&oh=154772c10c40570d848b85d43abdc1ef&oe=5CCEF67E'}}
+        <TextInput 
+          onChangeText={(text) => this.setState({username: text})}
         />
+        <Text>{this.state.username}</Text>
+        <Text>{this.state.username}</Text>
+        <TestCom></TestCom>
       </View>
     );
   }
