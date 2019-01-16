@@ -1,16 +1,21 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Image, ListView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Image, ScrollView, TouchableOpacity } from 'react-native';
 import TestCom from './src/components/TestCom';
+
 export default class App extends React.Component {
   constructor(props){
     super(props);
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    this.saveNew = this.saveNew.bind(this);
+
     this.state = {
       multiple: 1,
       username: 'thienth',
       email: 'thienth32@gmail.com',
-
-      posts: ds.cloneWithRows([
+      tmpid: "0",
+      tmptitle: "",
+      tmpimg: "",
+      tmpshortDesc: "",
+      posts: [
         {
           id: 1,
           title: "Đề cử top 100 gương mặt đẹp trai nhất châu Á: Nhân vật gây sốc nhất lại không thuộc showbiz Hoa ngữ",
@@ -23,22 +28,74 @@ export default class App extends React.Component {
           img: 'https://kenh14cdn.com/zoom/280_175/2019/1/10/ava-ngang-15471083072941271999927-crop-1547108727298370386490.png',
           shortDesc: "Ngày 10/1, danh sách đề cử top 100 gương mặt đẹp trai nhất Châu Á đã chính thức được tiết lộ với nhiều tên tuổi trong showbiz Hoa ngữ."
         }
-      ])
+      ]
     };
+  }
+  saveNew(){
+    console.log(this.state.tmpid, this.state.tmptitle,
+      this.state.tmpimg, this.state.tmpshortDesc);
+    let newPost = {
+      id: this.state.tmpid,
+      title: this.state.tmptitle,
+      img: this.state.tmpimg,
+      shortDesc: this.state.tmpshortDesc,
+    };
+    let tmpPosts = [...this.state.posts];
+    tmpPosts.push(newPost);
+    this.setState({
+      posts: tmpPosts,
+      tmpid: "0",
+      tmptitle: "",
+      tmpimg: "",
+      tmpshortDesc: "",
+    });
   }
 
   render() {
     
     return (
-        <ListView
-          dataSource={this.state.posts}
-          renderRow={(r) => 
-            <View>
-              <Image source={{uri: r.img}} style={{width: 100, height: 100}}/>
-              <Text>{r.title}</Text>
-            </View>
-          }
+       <ScrollView style={{marginTop: 50}}>
+         <Text>ID bài viết mới</Text>
+         <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(txt) => {this.setState({tmpid: txt})}}
+          value={`${this.state.tmpid}`}
         />
+        <Text>Tiêu đề bài viết </Text>
+         <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(txt) => {this.setState({tmptitle: txt})}}
+          value={this.state.tmptitle}
+        />
+
+        <Text>Ảnh đại diện </Text>
+         <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(txt) => {this.setState({tmpimg: txt})}}
+          value={this.state.tmpimg}
+        />
+
+        <Text>Mô tả ngắn </Text>
+         <TextInput
+          style={{height: 100, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(txt) => {this.setState({tmpshortDesc: txt})}}
+          value={this.state.tmpshortDesc}
+          multiline={true}
+        />
+        <TouchableOpacity
+         style={styles.button}
+         onPress={this.saveNew}
+        >
+          <Text>Thêm mới</Text>
+        </TouchableOpacity>
+        <Text>{this.state.username}</Text>
+         {this.state.posts.map(row => 
+            <View key={row.id}>
+              <Image source={{uri: row.img}} style={{width: 100, height: 100}}/>
+              <Text>{row.title}</Text>
+            </View>
+          )}
+       </ScrollView>
     );
   }
 }
@@ -49,5 +106,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#DDDDDD',
+    padding: 10
   },
 });
