@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Image, ScrollView, TouchableOpacity } from 'react-native';
 import TestCom from './src/components/TestCom';
+import firebaseConf from './src/helpers/firebase';
 
 export default class App extends React.Component {
   constructor(props){
@@ -15,22 +16,29 @@ export default class App extends React.Component {
       tmptitle: "",
       tmpimg: "",
       tmpshortDesc: "",
-      posts: [
-        {
-          id: 1,
-          title: "Đề cử top 100 gương mặt đẹp trai nhất châu Á: Nhân vật gây sốc nhất lại không thuộc showbiz Hoa ngữ",
-          img: 'http://kenh14cdn.com/zoom/460_289/2019/1/11/djsjsls-15471728449491750074128-crop-1547172849300513623247.jpg',
-          shortDesc: "Ngày 10/1, danh sách đề cử top 100 gương mặt đẹp trai nhất Châu Á đã chính thức được tiết lộ với nhiều tên tuổi trong showbiz Hoa ngữ."
-        },
-        {
-          id: 2,
-          title: "Góc cây khế: Truyền thông nước ngoài bóng gió chuyện chị em Kendall và Kylie bất hòa chỉ vì của ăn của để",
-          img: 'https://kenh14cdn.com/zoom/280_175/2019/1/10/ava-ngang-15471083072941271999927-crop-1547108727298370386490.png',
-          shortDesc: "Ngày 10/1, danh sách đề cử top 100 gương mặt đẹp trai nhất Châu Á đã chính thức được tiết lộ với nhiều tên tuổi trong showbiz Hoa ngữ."
-        }
-      ]
+      posts: []
     };
   }
+
+  componentDidMount() {
+    var that = this;
+    firebaseConf.database().ref('posts/').once('value', function (snapshot) {
+        let posts = [];
+        snapshot.forEach((child) => {
+
+          let item = {
+            key: child.key,
+            data: child.val()
+          }
+          posts.push(item);
+        });
+
+        that.setState({posts});
+        console.log(that.state.posts);
+    });
+  }
+  
+
   saveNew(){
     console.log(this.state.tmpid, this.state.tmptitle,
       this.state.tmpimg, this.state.tmpshortDesc);
@@ -88,11 +96,11 @@ export default class App extends React.Component {
         >
           <Text>Thêm mới</Text>
         </TouchableOpacity>
-        <Text>{this.state.username}</Text>
+          
          {this.state.posts.map(row => 
-            <View key={row.id}>
-              <Image source={{uri: row.img}} style={{width: 100, height: 100}}/>
-              <Text>{row.title}</Text>
+            <View key={row.key}>
+              <Image source={{uri: row.data.image}} style={{width: 100, height: 100}}/>
+              <Text>{row.data.name}</Text>
             </View>
           )}
        </ScrollView>
