@@ -7,8 +7,13 @@ export default class App extends React.Component {
   constructor(props){
     super(props);
     this.saveNew = this.saveNew.bind(this);
+    this.getWeather = this.getWeather.bind(this);
 
     this.state = {
+      weatherApiKey: "104f298a8d04f8f4c48d0553479b3b7e",
+      cityWeatherApi: "http://api.openweathermap.org/data/2.5/weather?appid=104f298a8d04f8f4c48d0553479b3b7e&units=metric&q=",
+      defaultCity: "hanoi",
+      weatherObj: null,
       multiple: 1,
       username: 'thienth',
       email: 'thienth32@gmail.com',
@@ -22,6 +27,8 @@ export default class App extends React.Component {
 
   componentDidMount() {
     var that = this;
+    this.getWeather()
+
     firebaseConf.database().ref('posts/').once('value', function (snapshot) {
         let posts = [];
         snapshot.forEach((child) => {
@@ -34,8 +41,20 @@ export default class App extends React.Component {
         });
 
         that.setState({posts});
-        console.log(that.state.posts);
+        // console.log(that.state.posts);
     });
+  }
+  
+  getWeather(){
+
+    fetch(this.state.cityWeatherApi + this.state.defaultCity, {
+      method: "GET"
+    })
+    .then((res) => res.json())
+    .then(data => {
+      // console.log(data);
+      this.setState({weatherObj: data});
+    })
   }
   
 
@@ -60,6 +79,17 @@ export default class App extends React.Component {
   }
 
   render() {
+    var weatherOutput = <Text>Loading</Text>;
+    if(this.state.weatherObj != null){
+      weatherOutput = (
+        <View>
+          <Text>Thành phố: {this.state.weatherObj.name}, {this.state.weatherObj.sys.country}</Text>
+          <Text>Nhiệt độ: {this.state.weatherObj.main.temp} độ C</Text>
+          <Text>Độ ẩm: {this.state.weatherObj.main.humidity}%</Text>
+          <Text>Tầm nhìn xa: {this.state.weatherObj.visibility/1000} km</Text>
+        </View>
+      );
+    }
     
     return (
        <ScrollView style={{marginTop: 50}}>
@@ -96,6 +126,17 @@ export default class App extends React.Component {
         >
           <Text>Thêm mới</Text>
         </TouchableOpacity>
+          <TextInput
+            value={this.state.defaultCity}
+            onChangeText={txt => {this.setState({defaultCity : txt})}}
+          />
+          <TouchableOpacity
+          style={styles.button}
+          onPress={this.getWeather}
+          >
+            <Text>Tìm kiếm</Text>
+          </TouchableOpacity>
+          {weatherOutput}
           
          {this.state.posts.map(row => 
             <View key={row.key}>
